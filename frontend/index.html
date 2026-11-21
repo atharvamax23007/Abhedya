@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abhedya | Secure Armory Network</title>
+    <style>
+        :root {
+            /* -------------------------------------
+               LIGHT THEME (Reference Palette)
+               ------------------------------------- */
+            --bg-main: #F6F7F9;
+            --bg-surface: #FFFFFF;
+            --bg-card: rgba(255, 255, 255, 0.92);
+            --text-main: #121316;
+            --text-muted: #5A5F6A;
+            --text-faint: #9299A6;
+            --border: #E2E5EC;
+            --border-strong: #C6CCD8;
+            --accent: #E87A1E;
+            --accent-hover: #CF6611;
+            --accent-soft: rgba(232, 122, 30, 0.12);
+            --btn-dark: #141517;
+            --btn-dark-text: #FFFFFF;
+            --wireframe-stroke: rgba(24, 28, 36, 0.56);
+            --wireframe-mid: rgba(24, 28, 36, 0.28);
+            --wireframe-faint: rgba(24, 28, 36, 0.12);
+            --shadow: 0 14px 36px rgba(18, 19, 22, 0.08);
+            --input-bg: #F1F3F6;
+            --status-success: #15803D;
+            --status-success-bg: #DCFCE7;
+            --status-danger: #B91C1C;
+            --status-danger-bg: #FEE2E2;
+            --choice-scrim: rgba(246, 247, 249, 0.52);
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            --tri-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'%3E%3Cpath d='M0 56 L32 0 L64 56 Z M0 0 L64 0 M0 56 L64 56' fill='none' stroke='rgba(18,19,22,0.055)' stroke-width='0.85'/%3E%3C/svg%3E");
+        }
+
+        /* -------------------------------------
+           DARK THEME (Black & Orange)
+           ------------------------------------- */
+        [data-theme="dark"] {
+            --bg-main: #090A0C;
+            --bg-surface: #111317;
+            --bg-card: rgba(17, 19, 23, 0.92);
+            --text-main: #F5F7FA;
+            --text-muted: #9BA3B4;
+            --text-faint: #62697A;
+            --border: #232730;
+            --border-strong: #363D4B;
+            --accent: #FF7A1A;
+            --accent-hover: #E5670C;
+            --accent-soft: rgba(255, 122, 26, 0.16);
+            --btn-dark: #FF7A1A;
+            --btn-dark-text: #090A0C;
+            --wireframe-stroke: rgba(245, 247, 250, 0.52);
+            --wireframe-mid: rgba(245, 247, 250, 0.24);
+            --wireframe-faint: rgba(245, 247, 250, 0.10);
+            --shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+            --input-bg: #171A20;
+            --status-success: #4ADE80;
+            --status-success-bg: rgba(74, 222, 128, 0.14);
+            --status-danger: #F87171;
+            --status-danger-bg: rgba(248, 113, 113, 0.14);
+            --choice-scrim: rgba(9, 10, 12, 0.62);
+            --tri-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='56' viewBox='0 0 64 56'%3E%3Cpath d='M0 56 L32 0 L64 56 Z M0 0 L64 0 M0 56 L64 56' fill='none' stroke='rgba(255,255,255,0.045)' stroke-width='0.85'/%3E%3C/svg%3E");
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            transition: background-color 0.35s ease, color 0.35s ease;
+        }
+
+        /* Triangular Geometric Background Pattern */
+        .triangle-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image: var(--tri-pattern);
+            background-size: 64px 56px;
+            background-position: center top;
+        }
+
+        /* -------------------------------------
+           TRANSPARENT TOP NAVIGATION BAR
+           ------------------------------------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 76px;
+            padding: 0 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+            z-index: 120;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.auth-choice-view .navbar {
+            background: rgba(12, 14, 18, 0.28);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        body.auth-choice-view .brand-wordmark,
+        body.auth-choice-view .nav-links li a,
+        body.auth-choice-view .hamburger-btn {
+            color: #FFFFFF;
+        }
+
+        body.auth-choice-view .nav-links li a.active {
+            color: var(--accent);
+        }
+
+        body.auth-choice-view .terminal-access-btn {
+            background: rgba(255, 255, 255, 0.12);
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        body.auth-split-view .navbar {
+            background: transparent;
+        }
+
+        body.auth-split-view .brand-wordmark,
+        body.auth-split-view .nav-links li a,
+        body.auth-split-view .hamburger-btn {
+            color: #FFFFFF;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
+        }
+
+        body.auth-split-view .nav-links li a.active {
+            color: var(--accent);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 3.2rem;
+        }
+
+        .brand-wordmark {
+            font-size: 1.55rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            cursor: pointer;
+            user-select: none;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 2.2rem;
+            align-items: center;
+        }
+
+        .nav-links li a {
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-links li a:hover { color: var(--text-main); }
+        .nav-links li a.active { color: var(--accent); font-weight: 600; }
+
+        .terminal-access-btn {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            padding: 0.68rem 1.35rem;
+            font-size: 0.88rem;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .terminal-access-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            width: 38px;
+            height: 38px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        @media (max-width: 960px) {
+            .nav-left { gap: 1rem; }
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 76px;
+                left: 0;
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0;
+                background: var(--bg-surface);
+                border-bottom: 1px solid var(--border);
+                box-shadow: var(--shadow);
+            }
+            .nav-links.mobile-open { display: flex; }
+            .nav-links li { width: 100%; border-bottom: 1px solid var(--border); }
+            .nav-links li a {
+                display: block;
+                width: 100%;
+                padding: 1rem 5%;
+                color: var(--text-main) !important;
+                text-shadow: none !important;
+            }
+            .nav-links li a.active { color: var(--accent) !important; }
+            .hamburger-btn { display: inline-flex; }
+            .terminal-access-btn { padding: 0.58rem 1rem; font-size: 0.82rem; }
+        }
+
+        /* -------------------------------------
+           PRE-LOGIN SECTIONS
+           ------------------------------------- */
+        #main-landing {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+
+        .main-tab {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .main-tab.active {
+            display: block;
+            animation: tabFade 0.28s ease;
+        }
+
+        @keyframes tabFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* -------------------------------------
+           TAB 1: STATIC HOME PAGE (Matches Reference)
+           ------------------------------------- */
+        .home-hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            min-height: 620px;
+            padding: 76px 4% 20px 4%;
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+            align-items: center;
+            gap: 1rem;
+            overflow: hidden;
+        }
+
+        .hero-left {
+            position: relative;
+            z-index: 3;
+            padding-left: 2%;
+        }
+
+        .hero-main-heading {
+            margin: 0 0 0.8rem 0;
+            font-size: clamp(2.8rem, 5.2vw, 4.65rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.06;
+            color: var(--text-main);
+        }
+
+        .hero-tagline {
+            margin: 0 0 2.5rem 0;
+            font-size: clamp(0.84rem, 1.18vw, 1.04rem);
+            font-weight: 500;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .hero-tagline .accent-part {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .hero-telemetry-strip {
+            display: flex;
+            align-items: flex-start;
+            gap: 2.2rem;
+            margin-bottom: 2.3rem;
+            font-family: var(--font-mono);
+            font-size: 0.66rem;
+            line-height: 1.55;
+            color: var(--text-faint);
+            text-transform: uppercase;
+        }
+
+        .telemetry-markers {
+            display: flex;
+            flex-direction: column;
+            gap: 1.05rem;
+        }
+
+        .marker-row {
+            display: flex;
+            justify-content: space-between;
+            width: 132px;
+            color: var(--text-muted);
+        }
+
+        .telemetry-coords {
+            border-left: 1px solid var(--border);
+            padding-left: 1rem;
+            letter-spacing: 0.08em;
+            min-width: 150px;
+        }
+
+        .telemetry-coords div {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.22rem;
+        }
+
+        .telemetry-coords .guide-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            min-width: 110px;
+        }
+
+        .init-row {
+            display: flex;
+            align-items: center;
+            gap: 1.6rem;
+        }
+
+        .init-system-btn {
+            background: var(--btn-dark);
+            color: var(--btn-dark-text);
+            border: 1px solid rgba(232, 122, 30, 0.55);
+            border-radius: 6px;
+            padding: 0.92rem 1.85rem;
+            font-size: 0.92rem;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            box-shadow: 0 0 0 1px rgba(232, 122, 30, 0.25), 0 10px 24px rgba(232, 122, 30, 0.22);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .init-system-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 0 2px rgba(232, 122, 30, 0.42), 0 14px 28px rgba(232, 122, 30, 0.30);
+        }
+
+        .init-meta-arrow {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            color: var(--text-faint);
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .hero-right {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 96px);
+            min-height: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #vault-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        @media (max-width: 960px) {
+            .home-hero {
+                height: auto;
+                min-height: 100vh;
+                grid-template-columns: 1fr;
+                padding-top: 96px;
+                padding-bottom: 36px;
+            }
+            .hero-left { padding-left: 0; }
+            .telemetry-coords .guide-line, .init-meta-arrow { display: none; }
+            .hero-right { height: 390px; min-height: 360px; }
+        }
+
+        /* -------------------------------------
+           TAB 2: FULL-SCREEN LOGIN / REGISTER WITH VIDEO
+           ------------------------------------- */
+        .auth-fullscreen {
+            position: relative;
+            width: 100vw;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+        }
+
+        /* Persistent Video Pane:
+           - Choice mode: full 100% background with gentle blur
+           - Split mode: left side (52%) crisp video */
+        .auth-video-pane {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0B0D11;
+            overflow: hidden;
+            z-index: 1;
+            transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .auth-video-pane video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.55s ease, transform 0.55s ease;
+        }
+
+        .auth-fullscreen.mode-choice .auth-video-pane {
+            width: 100%;
+        }
+
+        .auth-fullscreen.mode-choice .auth-video-pane video {
+            filter: blur(7px) brightness(0.58);
+            transform: scale(1.06);
+        }
+
+        .auth-video-scrim {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            transition: background 0.45s ease;
+        }
+
+        .auth-fullscreen.mode-choice .auth-video-scrim {
+            background: radial-gradient(circle at center, rgba(10, 12, 16, 0.25) 0%, rgba(10, 12, 16, 0.65) 100%);
+        }
+
+        .auth-fullscreen.mode-split .auth-video-pane {
+            width: 52%;
+        }
+
+        .auth-fullscreen.mode-split .auth-video-pane video {
+            filter: blur(0px) brightness(0.84) contrast(1.04);
+            transform: scale(1.0);
+        }
+
+        .auth-fullscreen.mode-split .auth-video-scrim {
+            background: linear-gradient(180deg, rgba(9, 10, 12, 0.45) 0%, rgba(9, 10, 12, 0.1) 30%, rgba(9, 10, 12, 0.62) 100%);
+        }
+
+        .video-pane-caption {
+            position: absolute;
+            bottom: 2.4rem;
+            left: 2.6rem;
+            right: 2.6rem;
+            z-index: 3;
+            color: #FFFFFF;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+        }
+
+        .auth-fullscreen.mode-split .video-pane-caption {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .video-pane-caption .tag {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 0.45rem;
+        }
+
+        .video-pane-caption h3 {
+            margin: 0;
+            font-size: 1.55rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .video-pane-caption p {
+            margin: 0.35rem 0 0 0;
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.78);
+            max-width: 440px;
+            line-height: 1.5;
+        }
+
+        /* Choice Overlay (Centered over blurred full-screen video) */
+        .auth-choice-stage {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            min-height: 100vh;
+            padding: 96px 4% 40px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-fullscreen.mode-split .auth-choice-stage {
+            display: none;
+        }
+
+        .choice-panel {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(16, 18, 22, 0.62);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            padding: 2.8rem 2.6rem;
+            text-align: center;
+            color: #FFFFFF;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .choice-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.65rem;
+        }
+
+        .choice-panel h2 {
+            margin: 0 0 0.6rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #FFFFFF;
+        }
+
+        .choice-panel p {
+            margin: 0 0 2rem 0;
+            font-size: 0.94rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.55;
+        }
+
+        .choice-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.95rem;
+        }
+
+        .choice-btn-primary {
+            width: 100%;
+            background: var(--accent);
+            color: #FFFFFF;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.98rem 1.5rem;
+            font-size: 0.96rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .choice-btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .choice-btn-secondary {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            border-radius: 8px;
+            padding: 0.98rem 1.5rem;
+            font-size: 0.96rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choice-btn-secondary:hover {
+            border-color: var(--accent);
+            background: rgba(232, 122, 30, 0.16);
+        }
+
+        /* Split Right-Side Details Filling Pane */
+        .auth-form-pane {
+            display: none;
+            position: relative;
+            z-index: 5;
+            margin-left: 52%;
+            width: 48%;
+            min-height: 100vh;
+            background-color: var(--bg-main);
+            background-image: var(--tri-pattern);
+            background-size: 64px 56px;
+            border-left: 1px solid var(--border);
+            padding: 96px 6% 42px 6%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-fullscreen.mode-split .auth-form-pane {
+            display: flex;
+            animation: slideInRight 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(24px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .auth-form-box {
+            width: 100%;
+            max-width: 460px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2.2rem 2.3rem;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-form-box h2 {
+            margin: 0 0 0.35rem 0;
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .auth-form-box .sub {
+            margin: 0 0 1.65rem 0;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .auth-substep { display: none; }
+        .auth-substep.active { display: block; animation: tabFade 0.25s ease; }
+
+        @media (max-width: 960px) {
+            .auth-fullscreen.mode-split {
+                flex-direction: column;
+            }
+            .auth-fullscreen.mode-split .auth-video-pane {
+                position: relative;
+                width: 100%;
+                height: 280px;
+                flex-shrink: 0;
+            }
+            .auth-fullscreen.mode-split .auth-form-pane {
+                margin-left: 0;
+                width: 100%;
+                min-height: calc(100vh - 280px);
+                border-left: none;
+                border-top: 1px solid var(--border);
+                padding: 2rem 5% 3rem 5%;
+            }
+        }
+
+        /* -------------------------------------
+           SHARED FORM & INTERNAL PANEL STYLES
+           ------------------------------------- */
+        .section-center {
+            min-height: 100vh;
+            padding: 108px 4% 48px 4%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .panel-card {
+            width: 100%;
+            max-width: 820px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+        }
+
+        .panel-card.narrow { max-width: 560px; }
+
+        .panel-card-header {
+            padding: 2rem 2.4rem 1.4rem 2.4rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-card-header h2 {
+            margin: 0;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .panel-card-header p {
+            margin: 0.45rem 0 0 0;
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .panel-card-body {
+            padding: 2rem 2.4rem 2.4rem 2.4rem;
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid-2 { grid-template-columns: 1fr; }
+            .panel-card-header, .panel-card-body, .auth-form-box { padding: 1.5rem; }
+        }
+
+        .field-group {
+            margin-bottom: 1.1rem;
+            text-align: left;
+        }
+
+        .field-group label {
+            display: block;
+            font-size: 0.76rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .field-control {
+            width: 100%;
+            background: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.82rem 0.95rem;
+            font-size: 0.94rem;
+            font-family: var(--font-sans);
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .field-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-surface);
+        }
+
+        .field-control:disabled {
+            opacity: 0.62;
+            cursor: not-allowed;
+        }
+
+        .password-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrap .field-control { padding-right: 4.5rem; }
+
+        .toggle-pass-btn {
+            position: absolute;
+            right: 0.6rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            padding: 0.26rem 0.55rem;
+            cursor: pointer;
+        }
+
+        .toggle-pass-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-primary-action {
+            width: 100%;
+            background: var(--btn-dark);
+            color: var(--btn-dark-text);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.9rem 1.5rem;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-action:hover {
+            background: var(--accent);
+            color: #FFFFFF;
+        }
+
+        .btn-secondary-action {
+            width: 100%;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border-strong);
+            border-radius: 8px;
+            padding: 0.9rem 1.5rem;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary-action:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .back-link-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            font-weight: 500;
+            padding: 0;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .back-link-btn:hover { color: var(--accent); }
+
+        .coming-soon-banner {
+            background: var(--accent-soft);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            font-size: 0.84rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+
+        .auth-error-box {
+            display: none;
+            background: var(--status-danger-bg);
+            color: var(--status-danger);
+            border: 1px solid var(--status-danger);
+            border-radius: 8px;
+            padding: 0.72rem 0.95rem;
+            font-size: 0.84rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .guide-list {
+            list-style: none;
+            padding: 0;
+            margin: 1.2rem 0 0 0;
+        }
+
+        .guide-list li {
+            padding: 0.85rem 0 0.85rem 1.35rem;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .guide-list li:last-child { border-bottom: none; }
+        .guide-list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 1.35rem;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .guide-list li strong { color: var(--text-main); }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-surface);
+        }
+
+        .setting-item h3 { margin: 0 0 0.25rem 0; font-size: 1rem; color: var(--text-main); }
+        .setting-item p { margin: 0; font-size: 0.86rem; color: var(--text-muted); }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--border-strong);
+            border-radius: 28px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .switch-slider::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 4px;
+            bottom: 4px;
+            background: var(--bg-surface);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .switch input:checked + .switch-slider { background: var(--accent); }
+        .switch input:checked + .switch-slider::before { transform: translateX(26px); }
+
+        /* -------------------------------------
+           POST-LOGIN DASHBOARD
+           ------------------------------------- */
+        #dashboard-view {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+
+        .dash-shell {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        .dash-sidebar {
+            width: 270px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: width 0.28s ease;
+        }
+
+        .dash-sidebar.collapsed { width: 76px; }
+
+        .dash-sidebar-top {
+            height: 76px;
+            padding: 0 22px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .dash-sidebar-title {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            color: var(--text-main);
+            transition: opacity 0.2s ease;
+        }
+
+        .dash-sidebar.collapsed .dash-sidebar-title {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .dash-nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 1rem 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dash-nav-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0.9rem 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .dash-nav-list li:hover {
+            color: var(--text-main);
+            background: var(--bg-main);
+        }
+
+        .dash-nav-list li.active-tab {
+            color: var(--accent);
+            background: var(--accent-soft);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .dash-nav-list li svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .dash-nav-label {
+            font-size: 0.88rem;
+            transition: opacity 0.2s ease;
+        }
+
+        .dash-sidebar.collapsed .dash-nav-label {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .dash-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            overflow-y: auto;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1rem;
+            padding-bottom: 1.1rem;
+            margin-bottom: 1.6rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dash-header h1 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .dash-header p {
+            margin: 0;
+            font-size: 0.84rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        .dash-header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            text-align: right;
+        }
+
+        .dash-net-status {
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        .dash-net-status strong { color: var(--accent); }
+
+        .icon-square-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-strong);
+            background: var(--bg-surface);
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .icon-square-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: tabFade 0.25s ease; }
+
+        .dash-stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dash-stat-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.35rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dash-stat-box span {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .dash-stat-box strong {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+        }
+
+        .dash-grid-main {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .dash-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .dash-card-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.1rem;
+            padding-bottom: 0.65rem;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .dash-card-title h3 {
+            margin: 0;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-main);
+        }
+
+        .dash-card-title a {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dash-card-title a:hover { color: var(--accent); }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.9rem;
+        }
+
+        .quick-tile {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.1rem 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-tile:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .quick-tile h4 { margin: 0 0 0.25rem 0; font-size: 0.86rem; color: var(--text-main); }
+        .quick-tile p { margin: 0; font-size: 0.74rem; color: var(--text-muted); }
+
+        .two-col-sub {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 7px;
+            background: var(--bg-main);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 0.85rem;
+        }
+
+        .progress-fill {
+            width: 65%;
+            height: 100%;
+            background: var(--accent);
+        }
+
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-row:last-child { border-bottom: none; }
+        .history-row p { margin: 0; font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
+        .history-row span { font-size: 0.76rem; font-family: var(--font-mono); color: var(--text-muted); }
+
+        .badge-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+        }
+
+        .badge-ok { color: var(--status-success); background: var(--status-success-bg); }
+        .badge-no { color: var(--status-danger); background: var(--status-danger-bg); }
+        .badge-pending { color: var(--accent); background: var(--accent-soft); }
+
+        .qr-box {
+            height: 150px;
+            border: 1px dashed var(--border-strong);
+            border-radius: 10px;
+            background: var(--bg-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 0.9rem;
+        }
+
+        @media (max-width: 1120px) {
+            .dash-grid-main { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 760px) {
+            .dash-stats-row, .two-col-sub { grid-template-columns: 1fr; }
+            .quick-grid { grid-template-columns: repeat(2, 1fr); }
+            .dash-main { padding: 1.25rem; }
+            .dash-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="triangle-bg"></div>
+
+    <!-- ==========================================
+         PRE-LOGIN NAVIGATION & VIEWS
+         ========================================== -->
+    <div id="main-landing">
+        <nav class="navbar">
+            <div class="nav-left">
+                <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Toggle Menu">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18" />
+                    </svg>
+                </button>
+                <a class="brand-wordmark" onclick="switchTab('tab-home', document.getElementById('nav-home'))">Abhedya</a>
+                <ul class="nav-links" id="navLinks">
+                    <li><a onclick="switchTab('tab-home', this)" id="nav-home" class="active">Home</a></li>
+                    <li><a onclick="switchTab('tab-contact', this)" id="nav-contact">Contact Support</a></li>
+                    <li><a onclick="switchTab('tab-guide', this)" id="nav-guide">System Guide</a></li>
+                    <li><a onclick="switchTab('tab-settings', this)" id="nav-settings">Settings</a></li>
+                </ul>
+            </div>
+
+            <button class="terminal-access-btn" id="nav-login" onclick="switchTab('tab-login', this)">
+                Secure Access Terminal
+            </button>
+        </nav>
+
+        <!-- TAB 1: STATIC HOME PAGE -->
+        <section id="tab-home" class="main-tab active">
+            <div class="home-hero">
+                <div class="hero-left">
+                    <h1 class="hero-main-heading">Abhedya Systems</h1>
+                    <p class="hero-tagline">
+                        <span class="accent-part">SECURE ARMORY NETWORK //</span> AIR-GAPPED TELEMETRY ACTIVE
+                    </p>
+
+                    <div class="hero-telemetry-strip">
+                        <div class="telemetry-markers">
+                            <div class="marker-row"><span>—</span><span>+</span><span>┐</span></div>
+                            <div style="letter-spacing: 0.08em;">
+                                *5E50A0AB088SPG7S1 &nbsp;&nbsp;&nbsp;&nbsp; 10<br>
+                                *8CE5CEA57DC01A011 *: 12104G5E177E4773<br>
+                                *20L-50KK6 508CA505CH1:05
+                            </div>
+                        </div>
+
+                        <div class="telemetry-coords">
+                            <div><span>COORDINATE</span><span class="guide-line"></span></div>
+                            <div><span>1852586</span><span class="guide-line"></span></div>
+                            <div><span>LOK.</span><span class="guide-line"></span></div>
+                            <div><span>SYSTEM</span><span class="guide-line"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="init-row">
+                        <button class="init-system-btn" onclick="switchTab('tab-login', document.getElementById('nav-login'))">
+                            Initialize System
+                        </button>
+                        <div class="init-meta-arrow">
+                            <span>SEC_CH: 04A<br>AUTH_NODE: READY</span>
+                            <span style="letter-spacing: -2px;">──────────&gt;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-right">
+                    <canvas id="vault-canvas"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: FULL-SCREEN LOGIN / REGISTER WITH VIDEO -->
+        <section id="tab-login" class="main-tab">
+            <div id="auth-fullscreen" class="auth-fullscreen mode-choice">
+                <!-- Persistent Video Pane (Full-screen blurred on choice; Left-half crisp on login/register) -->
+                <div class="auth-video-pane">
+                    <video id="auth-video" autoplay loop muted playsinline preload="auto">
+                        <source src="./Assets/home.mp4" type="video/mp4">
+                        <source src="Assets/home.mp4" type="video/mp4">
+                    </video>
+                    <div class="auth-video-scrim"></div>
+                    <div class="video-pane-caption">
+                        <div class="tag">Abhedya // Air-Gapped Terminal</div>
+                        <h3>Encrypted Armory Access</h3>
+                        <p>Zero-internet cryptographic session authentication for authorized unit personnel.</p>
+                    </div>
+                </div>
+
+                <!-- Step 1: Full-screen Login / Register Selection (over blurred video) -->
+                <div class="auth-choice-stage">
+                    <div class="choice-panel">
+                        <div class="choice-eyebrow">Secure Access Terminal</div>
+                        <h2>Select Access Mode</h2>
+                        <p>Authenticate with your unit credentials or view operator registration status.</p>
+                        <div class="choice-actions">
+                            <button class="choice-btn-primary" onclick="openAuthForm('auth-login')">Login</button>
+                            <button class="choice-btn-secondary" onclick="openAuthForm('auth-register')">Register</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 & 3: Right-Side Details Filling Pane (Left side displays video) -->
+                <div class="auth-form-pane">
+                    <div class="auth-form-box">
+                        <!-- Login Form -->
+                        <div id="auth-login" class="auth-substep active">
+                            <button class="back-link-btn" onclick="backToAuthChoice()">← Back to Selection</button>
+                            <h2>Operator Login</h2>
+                            <p class="sub">Enter your Command ID, Unit Code, and Password.</p>
+                            <div id="login-error" class="auth-error-box"></div>
+                            <form onsubmit="executeLogin(event)">
+                                <div class="field-group">
+                                    <label for="login-cmd">Command ID</label>
+                                    <input type="text" id="login-cmd" class="field-control" placeholder="e.g. CMD-001" required>
+                                </div>
+                                <div class="field-group">
+                                    <label for="login-unit">Unit Code</label>
+                                    <input type="text" id="login-unit" class="field-control" placeholder="e.g. UNIT-ALPHA" required>
+                                </div>
+                                <div class="field-group">
+                                    <label for="login-pwd">Password</label>
+                                    <div class="password-wrap">
+                                        <input type="password" id="login-pwd" class="field-control" placeholder="Enter Password" required>
+                                        <button type="button" class="toggle-pass-btn" onclick="togglePwd('login-pwd', this)">SHOW</button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary-action" style="margin-top: 0.45rem;">Secure Sign In</button>
+                            </form>
+                        </div>
+
+                        <!-- Register Coming Soon Form -->
+                        <div id="auth-register" class="auth-substep">
+                            <button class="back-link-btn" onclick="backToAuthChoice()">← Back to Selection</button>
+                            <h2>Operator Registration</h2>
+                            <p class="sub">New personnel enrollment details</p>
+                            <div class="coming-soon-banner">
+                                Registration – Coming Soon. Enrollment will open in an upcoming release.
+                            </div>
+                            <form onsubmit="event.preventDefault();">
+                                <div class="form-grid-2">
+                                    <div class="field-group">
+                                        <label>Full Name</label>
+                                        <input type="text" class="field-control" placeholder="Full Name" disabled>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Contact Number</label>
+                                        <input type="text" class="field-control" placeholder="Contact Number" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-grid-2">
+                                    <div class="field-group">
+                                        <label>Command ID</label>
+                                        <input type="text" class="field-control" placeholder="Command ID" disabled>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Unit Code</label>
+                                        <input type="text" class="field-control" placeholder="Unit Code" disabled>
+                                    </div>
+                                </div>
+                                <div class="field-group">
+                                    <label>Official Email Address</label>
+                                    <input type="email" class="field-control" placeholder="Official Email Address" disabled>
+                                </div>
+                                <div class="form-grid-2">
+                                    <div class="field-group">
+                                        <label>Password</label>
+                                        <input type="password" class="field-control" placeholder="Password" disabled>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Confirm Password</label>
+                                        <input type="password" class="field-control" placeholder="Confirm Password" disabled>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: CONTACT SUPPORT -->
+        <section id="tab-contact" class="main-tab">
+            <div class="section-center">
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <h2>Contact Support</h2>
+                        <p>Submit operational anomalies directly to the base intranet ledger.</p>
+                    </div>
+                    <div class="panel-card-body">
+                        <form onsubmit="event.preventDefault(); alert('Tactical report securely logged.'); this.reset();">
+                            <div class="form-grid-2">
+                                <div class="field-group">
+                                    <label>Personnel ID</label>
+                                    <input type="text" class="field-control" placeholder="e.g., S-1042" required>
+                                </div>
+                                <div class="field-group">
+                                    <label>Issue Category</label>
+                                    <select class="field-control" required>
+                                        <option value="" disabled selected hidden>Select Category...</option>
+                                        <option value="hardware">Hardware Failure</option>
+                                        <option value="token">JWT Sync Error</option>
+                                        <option value="network">Network Dropout</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label>Incident Details</label>
+                                <textarea class="field-control" rows="4" placeholder="Describe the system anomaly in detail..." required></textarea>
+                            </div>
+                            <div class="field-group">
+                                <label>Attach Hardware Photo (Optional)</label>
+                                <input type="file" accept="image/*" style="color: var(--text-muted); font-size: 0.88rem;">
+                            </div>
+                            <button type="submit" class="btn-primary-action" style="width: auto; padding: 0.85rem 2.2rem;">Submit Tactical Report</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: SYSTEM GUIDE -->
+        <section id="tab-guide" class="main-tab">
+            <div class="section-center">
+                <div class="panel-card">
+                    <div class="panel-card-header">
+                        <h2>System Guide</h2>
+                        <p>Zero-Internet Kote Management Protocol</p>
+                    </div>
+                    <div class="panel-card-body">
+                        <p style="margin: 0; color: var(--text-main); line-height: 1.7;">
+                            Abhedya operates as a closed-loop tactical intranet for armory and inventory workflows without relying on external cloud connectivity.
+                        </p>
+                        <ul class="guide-list">
+                            <li><strong>Air-Gapped Authorization:</strong> Approvals are encoded into cryptographically signed tokens for offline verification.</li>
+                            <li><strong>Biometric &amp; Token Checkout:</strong> Issuance pairs authorized request tokens with live operator verification.</li>
+                            <li><strong>Local Ledger Continuity:</strong> Endpoints maintain local transaction caches and synchronize when intra-base links are active.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: SETTINGS -->
+        <section id="tab-settings" class="main-tab">
+            <div class="section-center">
+                <div class="panel-card narrow">
+                    <div class="panel-card-header">
+                        <h2>Settings</h2>
+                        <p>Display and interface preferences</p>
+                    </div>
+                    <div class="panel-card-body">
+                        <div class="setting-item">
+                            <div>
+                                <h3>Dark Theme (Black &amp; Orange)</h3>
+                                <p>Switch between light reference mode and high-contrast dark mode.</p>
+                            </div>
+                            <label class="switch" title="Toggle Theme">
+                                <input type="checkbox" id="themeTogglePre" onchange="toggleThemeSlider(this)">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==========================================
+         POST-LOGIN DASHBOARD
+         ========================================== -->
+    <div id="dashboard-view">
+        <div class="dash-shell">
+            <aside class="dash-sidebar" id="sidebar">
+                <div class="dash-sidebar-top" onclick="toggleSidebar()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18" />
+                    </svg>
+                    <span class="dash-sidebar-title">ABHEDYA</span>
+                </div>
+
+                <ul class="dash-nav-list">
+                    <li onclick="navigateDash('main')" id="nav-dash-main" class="active-tab">
+                        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <span class="dash-nav-label">Dashboard</span>
+                    </li>
+                    <li onclick="navigateDash('generate')" id="nav-dash-generate">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                        <span class="dash-nav-label">Generate Request</span>
+                    </li>
+                    <li onclick="navigateDash('qr')" id="nav-dash-qr">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        <span class="dash-nav-label">My QR Token</span>
+                    </li>
+                    <li onclick="navigateDash('history')" id="nav-dash-history">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14"/></svg>
+                        <span class="dash-nav-label">Request History</span>
+                    </li>
+                    <li onclick="navigateDash('alerts')" id="nav-dash-alerts">
+                        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="dash-nav-label">Alerts</span>
+                    </li>
+                    <li onclick="navigateDash('profile')" id="nav-dash-profile">
+                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span class="dash-nav-label">Profile</span>
+                    </li>
+                    <li style="margin-top: auto; border-top: 1px solid var(--border);" onclick="logout()">
+                        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span class="dash-nav-label" style="color: var(--status-danger);">Logout</span>
+                    </li>
+                </ul>
+            </aside>
+
+            <main class="dash-main">
+                <div class="dash-header">
+                    <div>
+                        <h1 id="dynamic-greeting">Good Evening, Commander.</h1>
+                        <p id="dynamic-time-meta">Stay Alert. Stay Prepared.</p>
+                    </div>
+                    <div class="dash-header-right">
+                        <div class="dash-net-status">
+                            Local Network Online<br>
+                            <strong>Sync Link Active</strong>
+                        </div>
+                        <button class="icon-square-btn" onclick="toggleThemeIcon()" title="Toggle Theme">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="5"/>
+                                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VIEW: MAIN DASHBOARD -->
+                <div id="view-main" class="view-section active">
+                    <div class="dash-stats-row">
+                        <div class="dash-stat-box">
+                            <span>Total Requests Generated (Month)</span>
+                            <strong id="stat-total-req">32</strong>
+                        </div>
+                        <div class="dash-stat-box">
+                            <span>Equipment Issued (Active)</span>
+                            <strong>03</strong>
+                        </div>
+                    </div>
+
+                    <div class="dash-grid-main">
+                        <div>
+                            <div class="dash-card">
+                                <div class="dash-card-title">
+                                    <h3>Quick Actions</h3>
+                                    <a onclick="navigateDash('generate')">→</a>
+                                </div>
+                                <div class="quick-grid">
+                                    <div class="quick-tile" onclick="navigateDash('generate')">
+                                        <h4>Req Equip</h4>
+                                        <p>Submit New</p>
+                                    </div>
+                                    <div class="quick-tile" onclick="navigateDash('qr')">
+                                        <h4>QR Pass</h4>
+                                        <p>View Token</p>
+                                    </div>
+                                    <div class="quick-tile" onclick="navigateDash('history')">
+                                        <h4>My Requests</h4>
+                                        <p>Track Status</p>
+                                    </div>
+                                    <div class="quick-tile" onclick="navigateDash('history')">
+                                        <h4>History</h4>
+                                        <p>View Issued</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="two-col-sub">
+                                <div class="dash-card">
+                                    <div class="dash-card-title">
+                                        <h3>Current Request Status</h3>
+                                        <a onclick="navigateDash('history')">→</a>
+                                    </div>
+                                    <div id="active-req-item" style="font-weight: 700; font-size: 1.05rem;">INSAS Rifle</div>
+                                    <div id="req-date-stamp" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">--</div>
+                                    <div class="progress-track"><div class="progress-fill"></div></div>
+                                </div>
+
+                                <div class="dash-card">
+                                    <div class="dash-card-title">
+                                        <h3>Item Collection Slot</h3>
+                                        <a onclick="navigateDash('qr')">→</a>
+                                    </div>
+                                    <div id="dynamic-slot-date" style="font-weight: 700; font-size: 1.05rem;">--</div>
+                                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Armory Desk #3 • QR Ready</div>
+                                </div>
+                            </div>
+
+                            <div class="dash-card">
+                                <div class="dash-card-title">
+                                    <h3>Recent Requisitions</h3>
+                                    <a onclick="navigateDash('history')">All →</a>
+                                </div>
+                                <div id="recent-req-list">
+                                    <div class="history-row">
+                                        <div><p>INSAS Magazine</p><span>Nov 05, 2026 - 14:30</span></div>
+                                        <span class="badge-pill badge-ok">Approved</span>
+                                    </div>
+                                    <div class="history-row">
+                                        <div><p>Combat Boots</p><span>Nov 02, 2026 - 09:15</span></div>
+                                        <span class="badge-pill badge-no">Denied</span>
+                                    </div>
+                                    <div class="history-row">
+                                        <div><p>Tactical Radio</p><span>Oct 28, 2026 - 16:45</span></div>
+                                        <span class="badge-pill badge-ok">Approved</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="dash-card">
+                                <div class="dash-card-title">
+                                    <h3>Command Session</h3>
+                                </div>
+                                <div style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.35rem;">CMD-001</div>
+                                <div style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted);">Unit: UNIT-ALPHA</div>
+                                <div style="margin-top: 0.9rem;">
+                                    <span class="badge-pill badge-ok">● Session Verified</span>
+                                </div>
+                            </div>
+
+                            <div class="dash-card">
+                                <div class="dash-card-title">
+                                    <h3>Authorization Token</h3>
+                                </div>
+                                <div class="qr-box">[ SIGNED QR TOKEN ]</div>
+                                <button class="btn-secondary-action" onclick="navigateDash('qr')" style="padding: 0.65rem 1rem; font-size: 0.82rem;">Open Token View</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW: GENERATE REQUEST -->
+                <div id="view-generate" class="view-section">
+                    <div class="dash-card" style="max-width: 680px;">
+                        <div class="dash-card-title"><h3>Generate Requisition</h3></div>
+                        <form onsubmit="submitRequisition(event)">
+                            <div class="form-grid-2">
+                                <div class="field-group">
+                                    <label for="req-equipment">Equipment Item</label>
+                                    <select id="req-equipment" class="field-control" required>
+                                        <option value="" disabled selected hidden>Select Equipment...</option>
+                                        <option value="INSAS 5.56mm Rifle">INSAS 5.56mm Rifle</option>
+                                        <option value="INSAS Magazine (x3)">INSAS Magazine (x3)</option>
+                                        <option value="Tactical VHF Radio">Tactical VHF Radio</option>
+                                        <option value="Night Vision Monocular">Night Vision Monocular</option>
+                                        <option value="Kevlar Ballistic Vest">Kevlar Ballistic Vest</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label for="req-priority">Priority Level</label>
+                                    <select id="req-priority" class="field-control" required>
+                                        <option value="Standard">Standard Duty</option>
+                                        <option value="Urgent">Urgent Patrol</option>
+                                        <option value="Immediate">Immediate Tactical</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label for="req-notes">Mission / Purpose Notes</label>
+                                <textarea id="req-notes" class="field-control" rows="3" placeholder="Enter operational duty reference..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary-action" style="width: auto; padding: 0.8rem 2rem;">Log Requisition</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="view-qr" class="view-section">
+                    <div class="dash-card">
+                        <div class="dash-card-title"><h3>Active QR Token</h3></div>
+                        <div class="qr-box" style="height: 260px;">[ FULL SIZE SIGNED JWT TOKEN // CMD-001 // UNIT-ALPHA ]</div>
+                    </div>
+                </div>
+
+                <div id="view-history" class="view-section">
+                    <div class="dash-card">
+                        <div class="dash-card-title"><h3>Request History</h3></div>
+                        <div id="full-history-list">
+                            <div class="history-row">
+                                <div><p>INSAS Magazine</p><span>Nov 05, 2026 - 14:30</span></div>
+                                <span class="badge-pill badge-ok">Approved</span>
+                            </div>
+                            <div class="history-row">
+                                <div><p>Combat Boots</p><span>Nov 02, 2026 - 09:15</span></div>
+                                <span class="badge-pill badge-no">Denied</span>
+                            </div>
+                            <div class="history-row">
+                                <div><p>Tactical Radio</p><span>Oct 28, 2026 - 16:45</span></div>
+                                <span class="badge-pill badge-ok">Approved</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-alerts" class="view-section">
+                    <div class="dash-card">
+                        <div class="dash-card-title"><h3>System Alerts</h3></div>
+                        <p style="color: var(--text-muted); margin: 0;">All armory telemetry nodes nominal. Local subnet sync verified.</p>
+                    </div>
+                </div>
+
+                <div id="view-profile" class="view-section">
+                    <div class="dash-card">
+                        <div class="dash-card-title"><h3>Operator Profile</h3></div>
+                        <p style="font-family: var(--font-mono); color: var(--text-muted); margin: 0;">Command ID: CMD-001 | Unit Code: UNIT-ALPHA | Clearance: Active</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // -----------------------------------------------------
+        // PRE-LOGIN NAVIGATION & AUTH VIEW MODES
+        // -----------------------------------------------------
+        function ensureAuthVideoPlaying() {
+            const vid = document.getElementById('auth-video');
+            if (vid && vid.paused) {
+                vid.play().catch(() => {});
+            }
+        }
+
+        function syncBodyAuthClasses(tabId) {
+            document.body.classList.remove('auth-choice-view', 'auth-split-view');
+            if (tabId === 'tab-login') {
+                const container = document.getElementById('auth-fullscreen');
+                if (container && container.classList.contains('mode-split')) {
+                    document.body.classList.add('auth-split-view');
+                } else {
+                    document.body.classList.add('auth-choice-view');
+                }
+            }
+        }
+
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.main-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-links li a').forEach(link => link.classList.remove('active'));
+
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
+
+            if (element && element.id && element.id.startsWith('nav-') && element.id !== 'nav-login') {
+                element.classList.add('active');
+            }
+
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks) navLinks.classList.remove('mobile-open');
+
+            if (tabId === 'tab-login') {
+                ensureAuthVideoPlaying();
+            }
+
+            syncBodyAuthClasses(tabId);
+
+            if (tabId === 'tab-home') {
+                drawVaultFrame();
+            }
+        }
+
+        function toggleMobileNav() {
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks) navLinks.classList.toggle('mobile-open');
+        }
+
+        function openAuthForm(stepId) {
+            const container = document.getElementById('auth-fullscreen');
+            container.classList.remove('mode-choice');
+            container.classList.add('mode-split');
+
+            document.querySelectorAll('.auth-substep').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(stepId);
+            if (target) target.classList.add('active');
+
+            const err = document.getElementById('login-error');
+            if (err) err.style.display = 'none';
+
+            ensureAuthVideoPlaying();
+            syncBodyAuthClasses('tab-login');
+        }
+
+        function backToAuthChoice() {
+            const container = document.getElementById('auth-fullscreen');
+            container.classList.remove('mode-split');
+            container.classList.add('mode-choice');
+
+            const err = document.getElementById('login-error');
+            if (err) err.style.display = 'none';
+
+            syncBodyAuthClasses('tab-login');
+        }
+
+        function togglePwd(inputId, btnEl) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (btnEl) btnEl.textContent = 'HIDE';
+            } else {
+                input.type = 'password';
+                if (btnEl) btnEl.textContent = 'SHOW';
+            }
+        }
+
+        // -----------------------------------------------------
+        // AUTHENTICATION (Test Credentials: CMD-001 / UNIT-ALPHA / password123)
+        // -----------------------------------------------------
+        function executeLogin(event) {
+            event.preventDefault();
+            const cmd = document.getElementById('login-cmd').value.trim();
+            const unit = document.getElementById('login-unit').value.trim();
+            const pwd = document.getElementById('login-pwd').value;
+            const errorBox = document.getElementById('login-error');
+
+            if (!cmd || !unit || !pwd) {
+                errorBox.textContent = 'All fields (Command ID, Unit Code, Password) are required.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            if (cmd === 'CMD-001' && unit === 'UNIT-ALPHA' && pwd === 'password123') {
+                errorBox.style.display = 'none';
+                document.body.classList.remove('auth-choice-view', 'auth-split-view');
+                document.getElementById('main-landing').style.display = 'none';
+                document.getElementById('dashboard-view').style.display = 'block';
+                updateDateTime();
+                if (!window.dashClockInterval) {
+                    window.dashClockInterval = setInterval(updateDateTime, 60000);
+                }
+            } else {
+                errorBox.textContent = 'Invalid Command ID, Unit Code, or Password.';
+                errorBox.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            document.getElementById('dashboard-view').style.display = 'none';
+            document.getElementById('main-landing').style.display = 'block';
+            document.getElementById('login-cmd').value = '';
+            document.getElementById('login-unit').value = '';
+            document.getElementById('login-pwd').value = '';
+            backToAuthChoice();
+            switchTab('tab-home', document.getElementById('nav-home'));
+            navigateDash('main');
+        }
+
+        // -----------------------------------------------------
+        // THEME TOGGLE
+        // -----------------------------------------------------
+        let isDarkMode = false;
+
+        function applyTheme() {
+            if (isDarkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            const toggle = document.getElementById('themeTogglePre');
+            if (toggle) toggle.checked = isDarkMode;
+            drawVaultFrame();
+        }
+
+        function toggleThemeSlider(checkboxEl) {
+            isDarkMode = checkboxEl.checked;
+            applyTheme();
+        }
+
+        function toggleThemeIcon() {
+            isDarkMode = !isDarkMode;
+            applyTheme();
+        }
+
+        // -----------------------------------------------------
+        // DASHBOARD NAVIGATION & REQUISITION LOGGING
+        // -----------------------------------------------------
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            if (sb) sb.classList.toggle('collapsed');
+        }
+
+        function navigateDash(viewId) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.dash-nav-list li').forEach(li => li.classList.remove('active-tab'));
+
+            const targetView = document.getElementById('view-' + viewId);
+            if (targetView) targetView.classList.add('active');
+
+            const targetNav = document.getElementById('nav-dash-' + viewId);
+            if (targetNav) targetNav.classList.add('active-tab');
+        }
+
+        function submitRequisition(event) {
+            event.preventDefault();
+            const item = document.getElementById('req-equipment').value;
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            const stamp = `${dateStr} - ${timeStr}`;
+
+            const rowHTML = `
+                <div class="history-row">
+                    <div><p>${item}</p><span>${stamp}</span></div>
+                    <span class="badge-pill badge-pending">Pending</span>
+                </div>
+            `;
+
+            document.getElementById('recent-req-list').insertAdjacentHTML('afterbegin', rowHTML);
+            document.getElementById('full-history-list').insertAdjacentHTML('afterbegin', rowHTML);
+            document.getElementById('active-req-item').textContent = item;
+            document.getElementById('req-date-stamp').textContent = stamp;
+
+            const statEl = document.getElementById('stat-total-req');
+            if (statEl) statEl.textContent = String(parseInt(statEl.textContent, 10) + 1);
+
+            event.target.reset();
+            navigateDash('main');
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const h = now.getHours();
+            let greet = 'Good Evening, Commander.';
+            if (h >= 5 && h < 12) greet = 'Good Morning, Commander.';
+            else if (h >= 12 && h < 17) greet = 'Good Afternoon, Commander.';
+
+            const gEl = document.getElementById('dynamic-greeting');
+            if (gEl) gEl.textContent = greet;
+
+            const dateOpt = { month: 'short', day: '2-digit', year: 'numeric' };
+            const dateStr = now.toLocaleDateString('en-US', dateOpt);
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+            const metaEl = document.getElementById('dynamic-time-meta');
+            if (metaEl) metaEl.textContent = `${dateStr} - ${timeStr} | Stay Alert. Stay Prepared.`;
+
+            const reqEl = document.getElementById('req-date-stamp');
+            if (reqEl && reqEl.textContent === '--') reqEl.textContent = `${dateStr} - ${timeStr}`;
+
+            const tomorrow = new Date(now);
+            tomorrow.setDate(now.getDate() + 1);
+            const slotEl = document.getElementById('dynamic-slot-date');
+            if (slotEl) slotEl.textContent = tomorrow.toLocaleDateString('en-US', dateOpt);
+        }
+
+        // -----------------------------------------------------
+        // HIGH-DETAIL ISOMETRIC WIREFRAME VAULT CUBE (Matches Reference Image)
+        // -----------------------------------------------------
+        const vaultCanvas = document.getElementById('vault-canvas');
+        const vCtx = vaultCanvas ? vaultCanvas.getContext('2d') : null;
+        let mouseTilt = { x: 0, y: 0 };
+
+        // Project 3D coordinates into crisp architectural isometric view:
+        // Front-left face: z = +1 (vault door & circular lock wheel)
+        // Front-right face: x = +1 (open orange-lit interior racks)
+        // Top face: y = +1
+        function proj(x, y, z, cx, cy, scale) {
+            const rx = x * Math.cos(mouseTilt.x) - z * Math.sin(mouseTilt.x);
+            const rz = x * Math.sin(mouseTilt.x) + z * Math.cos(mouseTilt.x);
+            const ry = y * Math.cos(mouseTilt.y) - rz * Math.sin(mouseTilt.y);
+            const sx = cx + (rx - rz) * 0.866 * scale;
+            const sy = cy + ((rx + rz) * 0.48 - ry * 0.94) * scale;
+            return { x: sx, y: sy };
+        }
+
+        function line3D(a, b, cx, cy, scale, stroke, width = 1, dash = []) {
+            const p1 = proj(a[0], a[1], a[2], cx, cy, scale);
+            const p2 = proj(b[0], b[1], b[2], cx, cy, scale);
+            vCtx.save();
+            vCtx.strokeStyle = stroke;
+            vCtx.lineWidth = width;
+            if (dash.length) vCtx.setLineDash(dash);
+            vCtx.beginPath();
+            vCtx.moveTo(p1.x, p1.y);
+            vCtx.lineTo(p2.x, p2.y);
+            vCtx.stroke();
+            vCtx.restore();
+        }
+
+        function poly3D(points, cx, cy, scale, fillStyle, strokeStyle, lineWidth = 1) {
+            vCtx.save();
+            vCtx.beginPath();
+            points.forEach((pt, idx) => {
+                const p = proj(pt[0], pt[1], pt[2], cx, cy, scale);
+                if (idx === 0) vCtx.moveTo(p.x, p.y);
+                else vCtx.lineTo(p.x, p.y);
+            });
+            vCtx.closePath();
+            if (fillStyle) {
+                vCtx.fillStyle = fillStyle;
+                vCtx.fill();
+            }
+            if (strokeStyle) {
+                vCtx.strokeStyle = strokeStyle;
+                vCtx.lineWidth = lineWidth;
+                vCtx.stroke();
+            }
+            vCtx.restore();
+        }
+
+        function box3D(x0, y0, z0, x1, y1, z1, cx, cy, scale, stroke, width = 1) {
+            const edges = [
+                [[x0,y0,z0],[x1,y0,z0]], [[x1,y0,z0],[x1,y0,z1]], [[x1,y0,z1],[x0,y0,z1]], [[x0,y0,z1],[x0,y0,z0]],
+                [[x0,y1,z0],[x1,y1,z0]], [[x1,y1,z0],[x1,y1,z1]], [[x1,y1,z1],[x0,y1,z1]], [[x0,y1,z1],[x0,y1,z0]],
+                [[x0,y0,z0],[x0,y1,z0]], [[x1,y0,z0],[x1,y1,z0]], [[x1,y0,z1],[x1,y1,z1]], [[x0,y0,z1],[x0,y1,z1]]
+            ];
+            edges.forEach(e => line3D(e[0], e[1], cx, cy, scale, stroke, width));
+        }
+
+        function drawCircleOnFrontLeft(centerX, centerY, zPlane, radius, cx, cy, scale, stroke, width = 1) {
+            const steps = 44;
+            vCtx.save();
+            vCtx.strokeStyle = stroke;
+            vCtx.lineWidth = width;
+            vCtx.beginPath();
+            for (let i = 0; i <= steps; i++) {
+                const ang = (i / steps) * Math.PI * 2;
+                const px = centerX + Math.cos(ang) * radius;
+                const py = centerY + Math.sin(ang) * radius;
+                const p = proj(px, py, zPlane, cx, cy, scale);
+                if (i === 0) vCtx.moveTo(p.x, p.y);
+                else vCtx.lineTo(p.x, p.y);
+            }
+            vCtx.stroke();
+            vCtx.restore();
+        }
+
+        function drawVaultFrame() {
+            if (!vaultCanvas || !vCtx) return;
+            const rect = vaultCanvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const w = Math.max(rect.width, 320);
+            const h = Math.max(rect.height, 300);
+
+            if (vaultCanvas.width !== Math.floor(w * dpr) || vaultCanvas.height !== Math.floor(h * dpr)) {
+                vaultCanvas.width = Math.floor(w * dpr);
+                vaultCanvas.height = Math.floor(h * dpr);
+            }
+
+            vCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            vCtx.clearRect(0, 0, w, h);
+
+            const styles = getComputedStyle(document.documentElement);
+            const strokeMain = styles.getPropertyValue('--wireframe-stroke').trim();
+            const strokeMid = styles.getPropertyValue('--wireframe-mid').trim();
+            const strokeFaint = styles.getPropertyValue('--wireframe-faint').trim();
+            const accent = styles.getPropertyValue('--accent').trim();
+
+            const cx = w * 0.55;
+            const cy = h * 0.52;
+            const scale = Math.min(w, h) * 0.255;
+
+            // 1. Sweeping Point-Cloud Ribbon Behind Top-Left of Vault
+            vCtx.save();
+            for (let row = 0; row < 18; row++) {
+                for (let col = 0; col < 52; col++) {
+                    const u = col / 51;
+                    const v = row / 17;
+                    const waveX = -2.25 + u * 2.4 + Math.sin(v * Math.PI) * 0.25;
+                    const waveY = 1.45 - u * 1.9 + Math.sin(u * Math.PI * 2.2 + v * 1.5) * 0.28 + (v - 0.5) * 0.55;
+                    const waveZ = -0.5 + (v - 0.5) * 0.9;
+                    const p = proj(waveX, waveY, waveZ, cx, cy, scale);
+                    const fade = Math.sin(u * Math.PI) * Math.sin(v * Math.PI);
+                    const alpha = Math.max(0.02, fade * (isDarkMode ? 0.38 : 0.26));
+                    vCtx.fillStyle = isDarkMode
+                        ? `rgba(255,255,255,${alpha})`
+                        : `rgba(24,28,36,${alpha})`;
+                    vCtx.fillRect(p.x, p.y, 1.35, 1.35);
+                }
+            }
+            vCtx.restore();
+
+            // 2. Subtle Vertical Monospace Data Stream Behind Left Edge
+            vCtx.save();
+            vCtx.font = '8px monospace';
+            vCtx.fillStyle = isDarkMode ? 'rgba(255,255,255,0.16)' : 'rgba(24,28,36,0.20)';
+            const streamBase = proj(-1.45, 0.95, 0.45, cx, cy, scale);
+            for (let i = 0; i < 24; i++) {
+                vCtx.fillText(`0x${(1480 + i * 73).toString(16).toUpperCase()}  ::  SYNC_${(i + 10)}`, streamBase.x - 95, streamBase.y + i * 11);
+            }
+            vCtx.restore();
+
+            // 3. Outer CAD Construction Cage & Dimension Lines
+            box3D(-1.32, -1.28, -1.32, 1.32, 1.28, 1.32, cx, cy, scale, strokeFaint, 0.75);
+            // Extended projection lines along axes
+            line3D([-1.32, -1.28, 1.32], [-1.75, -1.28, 1.32], cx, cy, scale, strokeFaint, 0.75);
+            line3D([1.32, -1.28, 1.32], [1.75, -1.28, 1.32], cx, cy, scale, strokeFaint, 0.75);
+            line3D([1.32, 1.28, -1.32], [1.75, 1.28, -1.32], cx, cy, scale, strokeFaint, 0.75);
+            line3D([1.32, -1.28, -1.32], [1.32, -1.62, -1.32], cx, cy, scale, strokeFaint, 0.75);
+            // Orange dimension callout rails on bottom-right
+            line3D([1.38, -1.36, 1.15], [1.38, -1.36, -1.25], cx, cy, scale, accent, 0.9);
+            line3D([1.32, -1.36, 1.15], [1.44, -1.36, 1.15], cx, cy, scale, accent, 0.9);
+            line3D([1.32, -1.36, -1.25], [1.44, -1.36, -1.25], cx, cy, scale, accent, 0.9);
+
+            // 4. Translucent Structural Body & Warm Orange Illuminated Interior Chamber
+            // Back-left & floor subtle shading
+            poly3D(
+                [[-1.08, -1.08, -1.08], [1.08, -1.08, -1.08], [1.08, -1.08, 1.08], [-1.08, -1.08, 1.08]],
+                cx, cy, scale,
+                isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(20,24,32,0.04)',
+                null
+            );
+
+            // Glowing orange interior chamber plane (floor + back-right rack glow)
+            const glowOrigin = proj(0.28, 0.18, -0.15, cx, cy, scale);
+            const chamberGrad = vCtx.createRadialGradient(
+                glowOrigin.x, glowOrigin.y, scale * 0.08,
+                glowOrigin.x, glowOrigin.y, scale * 1.15
+            );
+            chamberGrad.addColorStop(0, isDarkMode ? 'rgba(255, 122, 26, 0.45)' : 'rgba(232, 122, 30, 0.36)');
+            chamberGrad.addColorStop(0.55, isDarkMode ? 'rgba(255, 122, 26, 0.16)' : 'rgba(232, 122, 30, 0.14)');
+            chamberGrad.addColorStop(1, 'rgba(232, 122, 30, 0)');
+
+            // Orange illuminated inner horizontal platform
+            poly3D(
+                [[-0.78, 0.04, -0.82], [0.86, 0.04, -0.82], [0.86, 0.04, 0.74], [-0.78, 0.04, 0.74]],
+                cx, cy, scale,
+                isDarkMode ? 'rgba(255, 122, 26, 0.16)' : 'rgba(232, 122, 30, 0.18)',
+                'rgba(232, 122, 30, 0.45)',
+                0.9
+            );
+
+            // Orange illuminated upper-right rack bay box
+            poly3D(
+                [[0.05, 0.08, -0.84], [0.84, 0.08, -0.84], [0.84, 0.76, -0.84], [0.05, 0.76, -0.84]],
+                cx, cy, scale,
+                isDarkMode ? 'rgba(255, 122, 26, 0.24)' : 'rgba(232, 122, 30, 0.24)',
+                accent,
+                0.95
+            );
+
+            vCtx.save();
+            vCtx.fillStyle = chamberGrad;
+            vCtx.beginPath();
+            vCtx.arc(glowOrigin.x, glowOrigin.y, scale * 1.12, 0, Math.PI * 2);
+            vCtx.fill();
+            vCtx.restore();
+
+            // 5. Dense Internal Server / Armory Rack Shelves (Orange Wireframe)
+            for (let sy = 0.12; sy <= 0.74; sy += 0.09) {
+                line3D([0.05, sy, -0.84], [0.84, sy, -0.84], cx, cy, scale, accent, 0.85);
+                line3D([0.84, sy, -0.84], [0.84, sy, 0.36], cx, cy, scale, 'rgba(232, 122, 30, 0.55)', 0.75);
+            }
+            for (let sx = 0.15; sx <= 0.75; sx += 0.15) {
+                line3D([sx, 0.08, -0.84], [sx, 0.76, -0.84], cx, cy, scale, 'rgba(232, 122, 30, 0.55)', 0.7);
+            }
+            for (let sz = -0.72; sz <= 0.36; sz += 0.18) {
+                line3D([0.84, 0.08, sz], [0.84, 0.76, sz], cx, cy, scale, 'rgba(232, 122, 30, 0.42)', 0.65);
+            }
+
+            // Lower interior compartment grid lines
+            for (let lz = -0.75; lz <= 0.65; lz += 0.28) {
+                line3D([-0.75, -0.82, lz], [0.82, -0.82, lz], cx, cy, scale, strokeFaint, 0.75);
+            }
+            for (let lx = -0.5; lx <= 0.7; lx += 0.3) {
+                line3D([lx, -0.82, -0.75], [lx, -0.82, 0.65], cx, cy, scale, strokeFaint, 0.75);
+            }
+
+            // 6. Primary Architectural Vault Cube & Nested Wall Thickness
+            box3D(-1.08, -1.08, -1.08, 1.08, 1.08, 1.08, cx, cy, scale, strokeMain, 1.25);
+            box3D(-0.94, -0.94, -0.94, 0.94, 0.94, 0.94, cx, cy, scale, strokeMid, 0.9);
+            box3D(-0.80, -0.80, -0.80, 0.80, 0.80, 0.80, cx, cy, scale, strokeFaint, 0.7);
+
+            // Corner bevel connectors between outer and middle vault walls
+            const corners = [
+                [-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1],
+                [-1,1,-1],[1,1,-1],[1,1,1],[-1,1,1]
+            ];
+            corners.forEach(c => {
+                line3D(
+                    [c[0]*1.08, c[1]*1.08, c[2]*1.08],
+                    [c[0]*0.94, c[1]*0.94, c[2]*0.94],
+                    cx, cy, scale, strokeMid, 0.8
+                );
+            });
+
+            // 7. Heavy Front-Left Vault Door (z = +1.08) + Hinges + Concentric Lock Wheel
+            poly3D(
+                [[-0.90, -0.90, 1.08], [0.90, -0.90, 1.08], [0.90, 0.90, 1.08], [-0.90, 0.90, 1.08]],
+                cx, cy, scale,
+                isDarkMode ? 'rgba(20, 23, 30, 0.42)' : 'rgba(246, 247, 249, 0.56)',
+                strokeMain,
+                1.2
+            );
+            poly3D(
+                [[-0.78, -0.78, 1.08], [0.78, -0.78, 1.08], [0.78, 0.78, 1.08], [-0.78, 0.78, 1.08]],
+                cx, cy, scale,
+                null,
+                strokeMid,
+                0.9
+            );
+
+            // Vault door locking hinges on left frame
+            box3D(-1.14, 0.42, 0.96, -1.04, 0.68, 1.12, cx, cy, scale, strokeMain, 1.0);
+            box3D(-1.14, -0.68, 0.96, -1.04, -0.42, 1.12, cx, cy, scale, strokeMain, 1.0);
+
+            // Circular Locking Wheel / Combination Dial on front-left vault door
+            const wheelX = -0.14;
+            const wheelY = -0.10;
+            const wheelZ = 1.09;
+            drawCircleOnFrontLeft(wheelX, wheelY, wheelZ, 0.42, cx, cy, scale, strokeMain, 1.25);
+            drawCircleOnFrontLeft(wheelX, wheelY, wheelZ, 0.34, cx, cy, scale, strokeMid, 0.95);
+            drawCircleOnFrontLeft(wheelX, wheelY, wheelZ, 0.22, cx, cy, scale, strokeMain, 1.0);
+            drawCircleOnFrontLeft(wheelX, wheelY, wheelZ, 0.08, cx, cy, scale, accent, 1.25);
+
+            // Radial spokes inside the vault wheel
+            for (let s = 0; s < 8; s++) {
+                const ang = (s / 8) * Math.PI * 2;
+                line3D(
+                    [wheelX + Math.cos(ang) * 0.09, wheelY + Math.sin(ang) * 0.09, wheelZ],
+                    [wheelX + Math.cos(ang) * 0.33, wheelY + Math.sin(ang) * 0.33, wheelZ],
+                    cx, cy, scale, s % 2 === 0 ? strokeMain : strokeMid, 0.9
+                );
+            }
+
+            // 8. Front-Right Open Wireframe Wing & Orange Telemetry Extension
+            line3D([1.08, -0.25, 0.95], [1.62, -0.25, 0.95], cx, cy, scale, accent, 0.9);
+            line3D([1.08, -0.25, -0.85], [1.62, -0.25, -0.85], cx, cy, scale, accent, 0.9);
+            line3D([1.62, -0.25, 0.95], [1.62, -0.25, -0.85], cx, cy, scale, accent, 0.85);
+
+            // 9. Lower-Left Mechanical Actuator / Optical Mount Assembly
+            box3D(-1.68, -0.92, 0.42, -1.22, -0.58, 0.86, cx, cy, scale, strokeMid, 0.95);
+            line3D([-1.22, -0.75, 0.64], [-1.08, -0.75, 0.64], cx, cy, scale, strokeMain, 1.1);
+            line3D([-1.68, -0.75, 0.64], [-2.18, -0.75, 0.64], cx, cy, scale, strokeFaint, 0.85, [3, 3]);
+
+            // 10. Floating Orange Numeric Telemetry Tables (Top-Right & Bottom-Right)
+            vCtx.save();
+            vCtx.font = '8.5px monospace';
+            vCtx.fillStyle = accent;
+
+            const topTbl = proj(1.08, 1.18, -1.18, cx, cy, scale);
+            for (let r = 0; r < 8; r++) {
+                vCtx.fillText(`0${r + 1}A  ${(4120 + r * 137)}`, topTbl.x + 28, topTbl.y + r * 10);
+                vCtx.fillText(`X${(88 - r * 3)}`, topTbl.x + 92, topTbl.y + r * 10);
+            }
+
+            const botTbl = proj(1.18, -1.12, 0.35, cx, cy, scale);
+            for (let r = 0; r < 7; r++) {
+                vCtx.fillText(`SEC_${r + 1}  ${(9012 + r * 89)}  OK`, botTbl.x + 12, botTbl.y + r * 10);
+            }
+            vCtx.restore();
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            const nx = (e.clientX / window.innerWidth - 0.5) * 0.11;
+            const ny = (e.clientY / window.innerHeight - 0.5) * 0.07;
+            mouseTilt.x = nx;
+            mouseTilt.y = ny;
+            if (document.getElementById('tab-home').classList.contains('active')) {
+                drawVaultFrame();
+            }
+        });
+
+        window.addEventListener('resize', drawVaultFrame);
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDateTime();
+            drawVaultFrame();
+            ensureAuthVideoPlaying();
+        });
+    </script>
+</body>
+</html>
